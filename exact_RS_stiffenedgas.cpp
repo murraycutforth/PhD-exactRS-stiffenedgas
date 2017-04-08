@@ -31,7 +31,7 @@ exact_rs_stiffenedgas :: exact_rs_stiffenedgas (double gamma_L, double gamma_R, 
 
 
 
-//
+
 void exact_rs_stiffenedgas :: solve_RP (const blitz::Array<double,1>& W_L, const blitz::Array<double,1>& W_R)
 {
 	assert(W_L(0) >= 0.0);
@@ -56,18 +56,18 @@ void exact_rs_stiffenedgas :: solve_RP (const blitz::Array<double,1>& W_L, const
 	{
 		// Left shock
 		
-		rho_star_L = W_L(0)*((P_STAR/W_L(2))+((gamma_L-1.0)/(gamma_L+1.0)))/(1.0+((P_STAR/W_L(2))*(gamma_L-1.0)/(gamma_L+1.0)));
-		S_L = W_L(1) - (Q_K(P_STAR,W_L(0),W_L(2),gamma_L)/W_L(0));
+		rho_star_L = W_L(0)*((2.0*gamma_L*pinf_L + (gamma_L+1.0)*P_STAR + (gamma_L-1.0)*W_L(2))/(2.0*(W_L(2) + gamma_L*pinf_L) + (gamma_L-1.0)*P_STAR + (gamma_L-1.0)*W_L(2)));
+		S_L = W_L(1) - (Q_K(P_STAR,W_L(0),W_L(2),gamma_L,pinf_L)/W_L(0));
 
 	}
 	else
 	{
 		// Left rarefaction
 
-		rho_star_L = W_L(0)*std::pow(P_STAR/W_L(2), 1.0/gamma_L);
+		rho_star_L = W_L(0)*std::pow((P_STAR + pinf_L)/(W_L(2) + pinf_L), 1.0/gamma_L);
 
-		double a_L = a(W_L(0), W_L(2), gamma_L);
-		double a_star_L = a_L*std::pow(P_STAR/W_L(2), (gamma_L-1.0)/(2.0*gamma_L));
+		double a_L = a(W_L(0), W_L(2), gamma_L, pinf_L);
+		double a_star_L = a_L*std::pow((P_STAR + pinf_L)/(W_L(2) + pinf_L), (gamma_L-1.0)/(2.0*gamma_L));
 
 		S_HL = W_L(1) - a_L;
 		S_TL = S_STAR - a_star_L;
@@ -77,18 +77,18 @@ void exact_rs_stiffenedgas :: solve_RP (const blitz::Array<double,1>& W_L, const
 	{
 		// Right shock
 				
-		rho_star_R = W_R(0)*((P_STAR/W_R(2))+((gamma_R-1.0)/(gamma_R+1.0)))/(1.0+((P_STAR/W_R(2))*(gamma_R-1.0)/(gamma_R+1.0)));
+		rho_star_R = W_R(0)*((2.0*gamma_R*pinf_R + (gamma_R+1.0)*P_STAR + (gamma_R-1.0)*W_R(2))/(2.0*(W_R(2) + gamma_R*pinf_R) + (gamma_R-1.0)*P_STAR + (gamma_R-1.0)*W_R(2)));
 
-		S_R = W_R(1) + (Q_K(P_STAR,W_R(0),W_R(2),gamma_R)/W_R(0));
+		S_R = W_R(1) + (Q_K(P_STAR,W_R(0),W_R(2),gamma_R,pinf_R)/W_R(0));
 	}
 	else
 	{
 		// Right rarefaction
 
-		rho_star_R = W_R(0)*std::pow(P_STAR/W_R(2), 1.0/gamma_R);
+		rho_star_R = W_R(0)*std::pow((P_STAR + pinf_R)/(W_R(2) + pinf_R), 1.0/gamma_R);
 
-		double a_R = a(W_R(0),W_R(2),gamma_R);
-		double a_star_R = a_R*std::pow(P_STAR/W_R(2), (gamma_R-1.0)/(2.0*gamma_R));
+		double a_R = a(W_R(0),W_R(2),gamma_R, pinf_R);
+		double a_star_R = a_R*std::pow((P_STAR + pinf_R)/(W_R(2) + pinf_R), (gamma_R-1.0)/(2.0*gamma_R));
 
 		S_HR = W_R(1) + a_R;
 		S_TR = S_STAR + a_star_R;
@@ -97,7 +97,7 @@ void exact_rs_stiffenedgas :: solve_RP (const blitz::Array<double,1>& W_L, const
 
 
 
-//
+
 
 blitz::Array<double,1> exact_rs_stiffenedgas :: sample_solution (const blitz::Array<double,1>& W_L, const blitz::Array<double,1>& W_R, double S)
 {
@@ -194,7 +194,9 @@ blitz::Array<double,1> exact_rs_stiffenedgas :: sample_solution (const blitz::Ar
 	return W;
 }
 
-//
+
+
+
 
 void exact_rs_stiffenedgas :: celledge_primitives_2D (
 		
@@ -214,7 +216,7 @@ void exact_rs_stiffenedgas :: celledge_primitives_2D (
 	
 	// Calculate u_star
 
-	S_STAR = 0.5*(W_L(1)+W_R(1)) + 0.5*(f(P_STAR,W_R(0),W_R(3),gamma_R) - f(P_STAR,W_L(0),W_L(3),gamma_L));
+	S_STAR = 0.5*(W_L(1)+W_R(1)) + 0.5*(f(P_STAR,W_R(0),W_R(3),gamma_R,pinf_R) - f(P_STAR,W_L(0),W_L(3),gamma_L,pinf_L));
 	
 	
 	if (S_STAR > 0.0)
@@ -227,7 +229,7 @@ void exact_rs_stiffenedgas :: celledge_primitives_2D (
 		{
 			// Left shock
 			
-			S_L = W_L(1) - (Q_K(P_STAR,W_L(0),W_L(3),gamma_L)/W_L(0));
+			S_L = W_L(1) - (Q_K(P_STAR,W_L(0),W_L(3),gamma_L,pinf_L)/W_L(0));
 			
 			if (S_L > 0.0)
 			{
@@ -235,7 +237,7 @@ void exact_rs_stiffenedgas :: celledge_primitives_2D (
 			}
 			else
 			{
-				soln(0) = W_L(0)*((P_STAR/W_L(3))+((gamma_L-1.0)/(gamma_L+1.0)))/(1.0+((P_STAR/W_L(3))*(gamma_L-1.0)/(gamma_L+1.0)));
+				soln(0) = W_L(0)*((2.0*gamma_L*pinf_L + (gamma_L+1.0)*P_STAR + (gamma_L-1.0)*W_L(3))/(2.0*(W_L(3) + gamma_L*pinf_L) + (gamma_L-1.0)*P_STAR + (gamma_L-1.0)*W_L(3)));
 				soln(1) = S_STAR;
 				soln(3) = P_STAR;
 			}
@@ -244,8 +246,8 @@ void exact_rs_stiffenedgas :: celledge_primitives_2D (
 		{
 			// Left rarefaction
 			
-			double a_L = a(W_L(0), W_L(3), gamma_L);
-			double a_star_L = a_L*std::pow(P_STAR/W_L(3), (gamma_L-1.0)/(2.0*gamma_L));
+			double a_L = a(W_L(0), W_L(3), gamma_L, pinf_L);
+			double a_star_L = a_L*std::pow((P_STAR + pinf_L)/(W_L(3) + pinf_L), (gamma_L-1.0)/(2.0*gamma_L));
 			S_HL = W_L(1) - a_L;
 			S_TL = S_STAR - a_star_L;
 			
@@ -257,16 +259,16 @@ void exact_rs_stiffenedgas :: celledge_primitives_2D (
 			{
 				if (S_TL < 0.0)
 				{
-					soln(0) = W_L(0)*std::pow(P_STAR/W_L(3), 1.0/gamma_L);
+					soln(0) = W_L(0)*std::pow((P_STAR + pinf_L)/(W_L(3) + pinf_L), 1.0/gamma_L);
 					soln(1) = S_STAR;
 					soln(3) = P_STAR;
 				}
 				else
 				{
-					double a_L = a(W_L(0),W_L(3),gamma_L);
+					double a_L = a(W_L(0),W_L(3),gamma_L,pinf_L);
 					soln(0) = W_L(0)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1)), 2.0/(gamma_L - 1.0));
 					soln(1) = (2.0/(gamma_L+1.0))*(a_L + ((gamma_L-1.0)/2.0)*W_L(1));
-					soln(3) = W_L(3)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1)), (2.0*gamma_L)/(gamma_L-1.0));
+					soln(3) = (W_L(3) + pinf_L)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1)), (2.0*gamma_L)/(gamma_L-1.0)) - pinf_L;
 				}
 			}
 		}
@@ -281,7 +283,7 @@ void exact_rs_stiffenedgas :: celledge_primitives_2D (
 		{
 			// Right shock
 			
-			S_R = W_R(1) + (Q_K(P_STAR,W_R(0),W_R(3),gamma_R)/W_R(0));
+			S_R = W_R(1) + (Q_K(P_STAR,W_R(0),W_R(3),gamma_R,pinf_R)/W_R(0));
 			
 			if (S_R < 0.0)
 			{
@@ -289,7 +291,7 @@ void exact_rs_stiffenedgas :: celledge_primitives_2D (
 			}
 			else
 			{
-				soln(0) = W_R(0)*((P_STAR/W_R(3))+((gamma_R-1.0)/(gamma_R+1.0)))/(1.0+((P_STAR/W_R(3))*(gamma_R-1.0)/(gamma_R+1.0)));
+				soln(0) = W_R(0)*((2.0*gamma_R*pinf_R + (gamma_R+1.0)*P_STAR + (gamma_R-1.0)*W_R(3))/(2.0*(W_R(3) + gamma_R*pinf_R) + (gamma_R-1.0)*P_STAR + (gamma_R-1.0)*W_R(3)));
 				soln(1) = S_STAR;
 				soln(3) = P_STAR;
 			}
@@ -298,8 +300,8 @@ void exact_rs_stiffenedgas :: celledge_primitives_2D (
 		{
 			// Right rarefaction
 			
-			double a_R = a(W_R(0),W_R(3),gamma_R);
-			double a_star_R = a_R*std::pow(P_STAR/W_R(3), (gamma_R-1.0)/(2.0*gamma_R));
+			double a_R = a(W_R(0),W_R(3),gamma_R,pinf_R);
+			double a_star_R = a_R*std::pow((P_STAR + pinf_R)/(W_R(3) + pinf_R), (gamma_R-1.0)/(2.0*gamma_R));
 			S_HR = W_R(1) + a_R;
 			S_TR = S_STAR + a_star_R;
 			
@@ -311,17 +313,17 @@ void exact_rs_stiffenedgas :: celledge_primitives_2D (
 			{
 				if (S_TL > 0.0)
 				{
-					soln(0) = W_R(0)*std::pow(P_STAR/W_R(3), 1.0/gamma_R);
+					soln(0) = W_R(0)*std::pow((P_STAR + pinf_R)/(W_R(3) + pinf_R), 1.0/gamma_R);
 					soln(1) = S_STAR;
 					soln(3) = P_STAR;
 				}
 				else
 				{
-					double a_R = a(W_R(0),W_R(3),gamma_R);
+					double a_R = a(W_R(0),W_R(3),gamma_R,pinf_R);
 
 					soln(0) = W_R(0)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1)), 2.0/(gamma_R - 1.0)); 
 					soln(1) = (2.0/(gamma_R+1.0))*(- a_R + ((gamma_R-1.0)/2.0)*W_R(1));
-					soln(3) = W_R(3)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1)), (2.0*gamma_R)/(gamma_R-1.0));
+					soln(3) = (W_R(3) + pinf_R)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1)), (2.0*gamma_R)/(gamma_R-1.0)) - pinf_R;
 				}
 			}
 		}
@@ -457,25 +459,25 @@ double exact_rs_stiffenedgas :: f_deriv (double p_star, double rho, double p, do
 
 
 
-//
+
 void exact_rs_stiffenedgas :: set_left_rarefaction_fan_state (const blitz::Array<double,1>& W_L, double S, blitz::Array<double,1>& W)
 {
-	double a_L = a(W_L(0),W_L(2),gamma_L);
+	double a_L = a(W_L(0),W_L(2),gamma_L,pinf_L);
 	W(0) = W_L(0)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1) - S), 2.0/(gamma_L - 1.0));
 	W(1) = (2.0/(gamma_L+1.0))*(a_L + S + ((gamma_L-1.0)/2.0)*W_L(1));
-	W(2) = W_L(2)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1) - S), (2.0*gamma_L)/(gamma_L-1.0));
+	W(2) = (W_L(2) + pinf_L)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1) - S), (2.0*gamma_L)/(gamma_L-1.0)) - pinf_L;
 }
 
 
 
 
-//
+
 void exact_rs_stiffenedgas :: set_right_rarefaction_fan_state (const blitz::Array<double,1>& W_R, double S, blitz::Array<double,1>& W)
 {
-	double a_R = a(W_R(0),W_R(2),gamma_R);
+	double a_R = a(W_R(0),W_R(2),gamma_R,pinf_R);
 	W(0) = W_R(0)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1) - S), 2.0/(gamma_R - 1.0));
 	W(1) = (2.0/(gamma_R+1.0))*(- a_R + S + ((gamma_R-1.0)/2.0)*W_R(1));
-	W(2) = W_R(2)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1) - S), (2.0*gamma_R)/(gamma_R-1.0));
+	W(2) = (W_R(2) + pinf_R)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1) - S), (2.0*gamma_R)/(gamma_R-1.0)) - pinf_R;
 }
 
 
