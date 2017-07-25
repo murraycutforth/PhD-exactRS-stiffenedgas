@@ -17,7 +17,7 @@ int main()
 {
 	// Output solution for each of the five Toro test cases
 
-	for (int TC = 1; TC <= 5; TC++)
+	for (int TC = 15; TC <= 16; TC++)
 	{
 		
 		blitz::Array<double,1> WL (3);
@@ -29,6 +29,7 @@ int main()
 		double gammaR = 1.4;
 		double pinf_L = 0.0;
 		double pinf_R = 0.0;
+		double offset = 0.5;
 	
 		if (TC == 1)
 		{
@@ -39,7 +40,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 0.1;
 			t = 0.25;
-			filename = "TTC1.dat";
+			filename = "./output/TTC1.dat";
 		}
 		else if (TC ==2)
 		{
@@ -50,7 +51,7 @@ int main()
 			WR(1) = 2.0;
 			WR(2) = 0.4;
 			t = 0.15;
-			filename = "TTC2.dat";
+			filename = "./output/TTC2.dat";
 		}
 		else if (TC ==3)
 		{
@@ -61,7 +62,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 0.01;
 			t = 0.012;
-			filename = "TTC3.dat";
+			filename = "./output/TTC3.dat";
 		}
 		else if (TC ==4)
 		{
@@ -72,7 +73,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 100.0;
 			t = 0.035;
-			filename = "TTC4.dat";
+			filename = "./output/TTC4.dat";
 		}
 		else if (TC ==5)
 		{
@@ -83,7 +84,176 @@ int main()
 			WR(1) = -6.19633;
 			WR(2) = 46.0950;
 			t = 0.035;
-			filename = "TTC5.dat";
+			filename = "./output/TTC5.dat";
+		}
+		else if (TC == 6)
+		{
+			// Air - Helium shock tube from Sambasivan 2009
+			
+			WL(0) = 1.0;
+			WL(1) = 0.0;
+			WL(2) = 1.0;
+			WR(0) = 0.125;
+			WR(1) = 0.0;
+			WR(2) = 0.1;
+			t = 0.25;
+			filename = "./output/Samb1.dat";
+			gammaR = 1.667;
+		}
+		else if (TC == 7)
+		{
+			// Gaseous shock tube from rGFM
+			
+			WL(0) = 1.0;
+			WL(1) = 0.0;
+			WL(2) = 100000.0;
+			WR(0) = 0.125;
+			WR(1) = 0.0;
+			WR(2) = 10000.0;
+			t = 0.0007;
+			filename = "./output/NE1.dat";
+			gammaR = 1.2;
+		}
+		else if (TC == 8)
+		{
+			// Air - water shock from rGFM
+			
+			WL(0) = 0.00596521;
+			WL(1) = 911.8821;
+			WL(2) = 1000.0;
+			WR(0) = 1.0;
+			WR(1) = 0.0;
+			WR(2) = 1.0;
+			gammaR = 7.15;
+			pinf_R = 3309.0;
+			t = 0.0007;
+			filename = "./output/rGFM2.dat";
+		}
+		else if (TC == 9)
+		{
+			// Air - water jet from rGFM
+			
+			WL(0) = 1.0;
+			WL(1) = 90.0;
+			WL(2) = 1.0;
+			WR(0) = 1000.0;
+			WR(1) = 0.0;
+			WR(2) = 1.0;
+			gammaR = 7.15;
+			pinf_R = 3309.0;
+			t = 0.015;
+			filename = "./output/rGFM4.dat";
+			offset = 0.6;
+		}
+		else if (TC == 10)
+		{
+			// Reversed version of TC 9
+			
+			WR(0) = 1.0;
+			WR(1) = -90.0;
+			WR(2) = 1.0;
+			WL(0) = 1000.0;
+			WL(1) = 0.0;
+			WL(2) = 1.0;
+			gammaL = 7.15;
+			pinf_L = 3309.0;
+			t = 0.015;
+			filename = "./output/rGFM_reversed.dat";
+			offset = 0.4;
+		}
+		else if (TC == 11)
+		{
+			// Water - air shock from Saurel 1999
+			
+			WL(0) = 1.0;
+			WL(1) = 0.0;
+			WL(2) = 4.0;
+			WR(0) = 0.05;
+			WR(1) = 0.0;
+			WR(2) = 0.0004;
+			gammaL = 4.4;
+			pinf_L = 2.4;
+			t = 0.12;
+			filename = "./output/Saurel1.dat";
+			offset = 0.7;
+		}
+		else if (TC == 12)
+		{
+			// Reversed version of TC 11
+			
+			WR(0) = 1.0;
+			WR(1) = 0.0;
+			WR(2) = 4.0;
+			WL(0) = 0.05;
+			WL(1) = 0.0;
+			WL(2) = 0.0004;
+			gammaR = 4.4;
+			pinf_R = 2.4;
+			t = 0.12;
+			filename = "./output/Saurel1_reversed.dat";
+			offset = 0.3;
+		}
+		else if (TC == 13)
+		{
+			// Numerical experiment 2
+			
+			WL(0) = 3.175962;
+			WL(1) = 9.434992;
+			WL(2) = 100.0;
+			WR(0) = 1.0;
+			WR(1) = 0.0;
+			WR(2) = 1.0;
+			gammaL = 1.667;
+			gammaR = 1.2;
+			t = 0.045;
+			filename = "./output/NE2.dat";
+			offset = 0.2;
+		}
+		else if (TC == 14)
+		{
+			// Numerical experiment 3
+			
+			WL(0) = 0.00596521;
+			WL(1) = 911.8821;
+			WL(2) = 100.0;
+			WR(0) = 1.0;
+			WR(1) = 0.0;
+			WR(2) = 1.0;
+			gammaL = 1.4;
+			gammaR = 7.15;
+			pinf_L = 0.0;
+			pinf_R = 3309.0;
+			t = 0.0007;
+			filename = "./output/NE3.dat";
+			offset = 0.5;
+		}
+		else if (TC == 15)
+		{
+			// Gaseous shock tube from So/Hu/Adams 2012
+			
+			WL(0) = 1.0;
+			WL(1) = 0.0;
+			WL(2) = 1.0;
+			WR(0) = 0.125;
+			WR(1) = 0.0;
+			WR(2) = 0.1;
+			t = 0.15;
+			filename = "./output/ST3.dat";
+			gammaR = 1.667;
+		}
+		else if (TC == 16)
+		{
+			// Gaseous shock tube from Garrick/Owkes/Regele 2016
+			
+			WL(0) = 1.0;
+			WL(1) = 0.0;
+			WL(2) = 1.0;
+			WR(0) = 0.125;
+			WR(1) = 0.0;
+			WR(2) = 0.1;
+			t = 0.15;
+			filename = "./output/ST1.dat";
+			gammaR = 2.4;
 		}
 	
 	
@@ -99,11 +269,10 @@ int main()
 		std::cout << "Left rarefaction head speed calculated as " << RS.S_HL << std::endl;
 		std::cout << "Left rarefaction tail speed calculated as " << RS.S_TL << std::endl;
 		std::cout << "Right rarefaction head speed calculated as " << RS.S_HR << std::endl;
-		std::cout << "Right rarefaction tail speed calculated as " << RS.S_TR << std::endl;
+		std::cout << "Right rarefaction tail speed calculated as " << RS.S_TR << std::endl << std::endl;
 	
 		double xmin = 0.0;
 		double xmax = 1.0;
-		double offset = 0.5;
 		int numsamples = 10000;
 		double delx = (xmax - xmin)/numsamples;
 	

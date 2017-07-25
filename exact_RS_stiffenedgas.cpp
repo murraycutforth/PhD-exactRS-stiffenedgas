@@ -42,8 +42,7 @@ void exact_rs_stiffenedgas :: solve_RP (const blitz::Array<double,1>& W_L, const
 	
 	// Calculate p_star
 
-	P_STAR = find_p_star_newtonraphson(W_L(0), W_L(1), W_L(2), W_R(0), W_R(1), W_R(2));
-	
+	P_STAR = find_p_star_newtonraphson(W_L(0), W_L(1), W_L(2), W_R(0), W_R(1), W_R(2));	
 	
 	// Calculate u_star
 
@@ -355,13 +354,10 @@ double exact_rs_stiffenedgas :: find_p_star_newtonraphson (
 	const double TOL = 1e-6;
 
 
-	// First we set the initial guess for p_star using the PVRS approximation
-
-	const double a_L = a(rho_L, p_L, gamma_L, pinf_L);
-	const double a_R = a(rho_R, p_R, gamma_R, pinf_R);
-	p_star_next = 0.5*(p_L+p_R) - 0.125*(u_R - u_L)*(rho_L + rho_R)*(a_L + a_R);
-	p_star_next = std::max(TOL, p_star_next);
-
+	// First we set the initial guess for p_star using a simple mean-value approximation
+		
+	p_star_next = 0.5*(p_L+p_R);
+	
 	
 	// Now use the Newton-Raphson algorithm
 
@@ -369,8 +365,12 @@ double exact_rs_stiffenedgas :: find_p_star_newtonraphson (
 		p_star = p_star_next;
 
 		p_star_next = p_star - total_pressure_function(p_star,rho_L,u_L,p_L,rho_R,u_R,p_R)/total_pressure_function_deriv(p_star,rho_L,p_L,rho_R,p_R);
+		
+		p_star_next = std::max(p_star_next, TOL);
 
 	} while ((fabs(p_star_next - p_star)/(0.5*(p_star+p_star_next)) > TOL));
+	
+	assert(p_star_next != TOL);
 
 	return p_star_next;
 }
