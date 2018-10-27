@@ -35,14 +35,15 @@ exact_rs_stiffenedgas :: exact_rs_stiffenedgas (double gamma_L, double gamma_R, 
 void exact_rs_stiffenedgas :: solve_RP (const blitz::Array<double,1>& W_L, const blitz::Array<double,1>& W_R)
 {
 	assert(W_L(0) >= 0.0);
-	assert(W_L(2) >= 0.0);
+	// assert(W_L(2) >= 0.0); Since stiffened gases will often exhibit p<0..
 	assert(W_R(0) >= 0.0);
-	assert(W_R(2) >= 0.0);
+	// assert(W_R(2) >= 0.0);
 
 	
 	// Calculate p_star
 
 	P_STAR = find_p_star_newtonraphson(W_L(0), W_L(1), W_L(2), W_R(0), W_R(1), W_R(2));	
+		
 	
 	// Calculate u_star
 
@@ -204,129 +205,129 @@ void exact_rs_stiffenedgas :: celledge_primitives_2D (
 	blitz::Array<double,1>& soln
 )
 {
-	const double v_L = W_L(2);
-	const double v_R = W_R(2);
+	//~ const double v_L = W_L(2);
+	//~ const double v_R = W_R(2);
 	
 	
-	// Calculate p_star
+	//~ // Calculate p_star
 
-	P_STAR = find_p_star_newtonraphson(W_L(0), W_L(1), W_L(3), W_R(0), W_R(1), W_R(3));
+	//~ P_STAR = find_p_star_newtonraphson(W_L(0), W_L(1), W_L(3), W_R(0), W_R(1), W_R(3));
 	
 	
-	// Calculate u_star
+	//~ // Calculate u_star
 
-	S_STAR = 0.5*(W_L(1)+W_R(1)) + 0.5*(f(P_STAR,W_R(0),W_R(3),gamma_R,pinf_R) - f(P_STAR,W_L(0),W_L(3),gamma_L,pinf_L));
+	//~ S_STAR = 0.5*(W_L(1)+W_R(1)) + 0.5*(f(P_STAR,W_R(0),W_R(3),gamma_R,pinf_R) - f(P_STAR,W_L(0),W_L(3),gamma_L,pinf_L));
 	
 	
-	if (S_STAR > 0.0)
-	{
-		// Look at states to the left of the contact
+	//~ if (S_STAR > 0.0)
+	//~ {
+		//~ // Look at states to the left of the contact
 		
-		soln(2) = v_L;
+		//~ soln(2) = v_L;
 		
-		if (P_STAR > W_L(3))
-		{
-			// Left shock
+		//~ if (P_STAR > W_L(3))
+		//~ {
+			//~ // Left shock
 			
-			S_L = W_L(1) - (Q_K(P_STAR,W_L(0),W_L(3),gamma_L,pinf_L)/W_L(0));
+			//~ S_L = W_L(1) - (Q_K(P_STAR,W_L(0),W_L(3),gamma_L,pinf_L)/W_L(0));
 			
-			if (S_L > 0.0)
-			{
-				soln = W_L;
-			}
-			else
-			{
-				soln(0) = W_L(0)*((2.0*gamma_L*pinf_L + (gamma_L+1.0)*P_STAR + (gamma_L-1.0)*W_L(3))/(2.0*(W_L(3) + gamma_L*pinf_L) + (gamma_L-1.0)*P_STAR + (gamma_L-1.0)*W_L(3)));
-				soln(1) = S_STAR;
-				soln(3) = P_STAR;
-			}
-		}
-		else
-		{
-			// Left rarefaction
+			//~ if (S_L > 0.0)
+			//~ {
+				//~ soln = W_L;
+			//~ }
+			//~ else
+			//~ {
+				//~ soln(0) = W_L(0)*((2.0*gamma_L*pinf_L + (gamma_L+1.0)*P_STAR + (gamma_L-1.0)*W_L(3))/(2.0*(W_L(3) + gamma_L*pinf_L) + (gamma_L-1.0)*P_STAR + (gamma_L-1.0)*W_L(3)));
+				//~ soln(1) = S_STAR;
+				//~ soln(3) = P_STAR;
+			//~ }
+		//~ }
+		//~ else
+		//~ {
+			//~ // Left rarefaction
 			
-			double a_L = a(W_L(0), W_L(3), gamma_L, pinf_L);
-			double a_star_L = a_L*std::pow((P_STAR + pinf_L)/(W_L(3) + pinf_L), (gamma_L-1.0)/(2.0*gamma_L));
-			S_HL = W_L(1) - a_L;
-			S_TL = S_STAR - a_star_L;
+			//~ double a_L = a(W_L(0), W_L(3), gamma_L, pinf_L);
+			//~ double a_star_L = a_L*std::pow((P_STAR + pinf_L)/(W_L(3) + pinf_L), (gamma_L-1.0)/(2.0*gamma_L));
+			//~ S_HL = W_L(1) - a_L;
+			//~ S_TL = S_STAR - a_star_L;
 			
-			if (S_HL > 0.0)
-			{
-				soln = W_L;
-			}
-			else
-			{
-				if (S_TL < 0.0)
-				{
-					soln(0) = W_L(0)*std::pow((P_STAR + pinf_L)/(W_L(3) + pinf_L), 1.0/gamma_L);
-					soln(1) = S_STAR;
-					soln(3) = P_STAR;
-				}
-				else
-				{
-					double a_L = a(W_L(0),W_L(3),gamma_L,pinf_L);
-					soln(0) = W_L(0)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1)), 2.0/(gamma_L - 1.0));
-					soln(1) = (2.0/(gamma_L+1.0))*(a_L + ((gamma_L-1.0)/2.0)*W_L(1));
-					soln(3) = (W_L(3) + pinf_L)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1)), (2.0*gamma_L)/(gamma_L-1.0)) - pinf_L;
-				}
-			}
-		}
-	}
-	else
-	{
-		// Look at states to the right of the contact
+			//~ if (S_HL > 0.0)
+			//~ {
+				//~ soln = W_L;
+			//~ }
+			//~ else
+			//~ {
+				//~ if (S_TL < 0.0)
+				//~ {
+					//~ soln(0) = W_L(0)*std::pow((P_STAR + pinf_L)/(W_L(3) + pinf_L), 1.0/gamma_L);
+					//~ soln(1) = S_STAR;
+					//~ soln(3) = P_STAR;
+				//~ }
+				//~ else
+				//~ {
+					//~ double a_L = a(W_L(0),W_L(3),gamma_L,pinf_L);
+					//~ soln(0) = W_L(0)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1)), 2.0/(gamma_L - 1.0));
+					//~ soln(1) = (2.0/(gamma_L+1.0))*(a_L + ((gamma_L-1.0)/2.0)*W_L(1));
+					//~ soln(3) = (W_L(3) + pinf_L)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1)), (2.0*gamma_L)/(gamma_L-1.0)) - pinf_L;
+				//~ }
+			//~ }
+		//~ }
+	//~ }
+	//~ else
+	//~ {
+		//~ // Look at states to the right of the contact
 		
-		soln(2) = v_R;
+		//~ soln(2) = v_R;
 		
-		if (P_STAR > W_R(3))
-		{
-			// Right shock
+		//~ if (P_STAR > W_R(3))
+		//~ {
+			//~ // Right shock
 			
-			S_R = W_R(1) + (Q_K(P_STAR,W_R(0),W_R(3),gamma_R,pinf_R)/W_R(0));
+			//~ S_R = W_R(1) + (Q_K(P_STAR,W_R(0),W_R(3),gamma_R,pinf_R)/W_R(0));
 			
-			if (S_R < 0.0)
-			{
-				soln = W_R;
-			}
-			else
-			{
-				soln(0) = W_R(0)*((2.0*gamma_R*pinf_R + (gamma_R+1.0)*P_STAR + (gamma_R-1.0)*W_R(3))/(2.0*(W_R(3) + gamma_R*pinf_R) + (gamma_R-1.0)*P_STAR + (gamma_R-1.0)*W_R(3)));
-				soln(1) = S_STAR;
-				soln(3) = P_STAR;
-			}
-		}
-		else
-		{
-			// Right rarefaction
+			//~ if (S_R < 0.0)
+			//~ {
+				//~ soln = W_R;
+			//~ }
+			//~ else
+			//~ {
+				//~ soln(0) = W_R(0)*((2.0*gamma_R*pinf_R + (gamma_R+1.0)*P_STAR + (gamma_R-1.0)*W_R(3))/(2.0*(W_R(3) + gamma_R*pinf_R) + (gamma_R-1.0)*P_STAR + (gamma_R-1.0)*W_R(3)));
+				//~ soln(1) = S_STAR;
+				//~ soln(3) = P_STAR;
+			//~ }
+		//~ }
+		//~ else
+		//~ {
+			//~ // Right rarefaction
 			
-			double a_R = a(W_R(0),W_R(3),gamma_R,pinf_R);
-			double a_star_R = a_R*std::pow((P_STAR + pinf_R)/(W_R(3) + pinf_R), (gamma_R-1.0)/(2.0*gamma_R));
-			S_HR = W_R(1) + a_R;
-			S_TR = S_STAR + a_star_R;
+			//~ double a_R = a(W_R(0),W_R(3),gamma_R,pinf_R);
+			//~ double a_star_R = a_R*std::pow((P_STAR + pinf_R)/(W_R(3) + pinf_R), (gamma_R-1.0)/(2.0*gamma_R));
+			//~ S_HR = W_R(1) + a_R;
+			//~ S_TR = S_STAR + a_star_R;
 			
-			if (S_HR < 0.0)
-			{
-				soln = W_R;
-			}
-			else
-			{
-				if (S_TL > 0.0)
-				{
-					soln(0) = W_R(0)*std::pow((P_STAR + pinf_R)/(W_R(3) + pinf_R), 1.0/gamma_R);
-					soln(1) = S_STAR;
-					soln(3) = P_STAR;
-				}
-				else
-				{
-					double a_R = a(W_R(0),W_R(3),gamma_R,pinf_R);
+			//~ if (S_HR < 0.0)
+			//~ {
+				//~ soln = W_R;
+			//~ }
+			//~ else
+			//~ {
+				//~ if (S_TL > 0.0)
+				//~ {
+					//~ soln(0) = W_R(0)*std::pow((P_STAR + pinf_R)/(W_R(3) + pinf_R), 1.0/gamma_R);
+					//~ soln(1) = S_STAR;
+					//~ soln(3) = P_STAR;
+				//~ }
+				//~ else
+				//~ {
+					//~ double a_R = a(W_R(0),W_R(3),gamma_R,pinf_R);
 
-					soln(0) = W_R(0)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1)), 2.0/(gamma_R - 1.0)); 
-					soln(1) = (2.0/(gamma_R+1.0))*(- a_R + ((gamma_R-1.0)/2.0)*W_R(1));
-					soln(3) = (W_R(3) + pinf_R)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1)), (2.0*gamma_R)/(gamma_R-1.0)) - pinf_R;
-				}
-			}
-		}
-	}
+					//~ soln(0) = W_R(0)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1)), 2.0/(gamma_R - 1.0)); 
+					//~ soln(1) = (2.0/(gamma_R+1.0))*(- a_R + ((gamma_R-1.0)/2.0)*W_R(1));
+					//~ soln(3) = (W_R(3) + pinf_R)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1)), (2.0*gamma_R)/(gamma_R-1.0)) - pinf_R;
+				//~ }
+			//~ }
+		//~ }
+	//~ }
 }
 
 
@@ -357,6 +358,7 @@ double exact_rs_stiffenedgas :: find_p_star_newtonraphson (
 	// First we set the initial guess for p_star using a simple mean-value approximation
 		
 	p_star_next = 0.5*(p_L+p_R);
+	int n = 0;
 	
 	
 	// Now use the Newton-Raphson algorithm
@@ -367,10 +369,12 @@ double exact_rs_stiffenedgas :: find_p_star_newtonraphson (
 		p_star_next = p_star - total_pressure_function(p_star,rho_L,u_L,p_L,rho_R,u_R,p_R)/total_pressure_function_deriv(p_star,rho_L,p_L,rho_R,p_R);
 		
 		p_star_next = std::max(p_star_next, TOL);
+		
+		n++;
 
-	} while ((fabs(p_star_next - p_star)/(0.5*(p_star+p_star_next)) > TOL));
+	} while ((fabs(p_star_next - p_star)/(0.5*(p_star+p_star_next)) > TOL) && n < 100);
 	
-	assert(p_star_next != TOL);
+	if (n == 100) p_star_next = 0.5*(p_L+p_R);
 
 	return p_star_next;
 }

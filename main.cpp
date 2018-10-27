@@ -17,7 +17,7 @@ int main()
 {
 	// Output solution for each of the five Toro test cases
 
-	for (int TC = 15; TC <= 16; TC++)
+	for (int TC = 16; TC <= 17; TC++)
 	{
 		
 		blitz::Array<double,1> WL (3);
@@ -30,6 +30,8 @@ int main()
 		double pinf_L = 0.0;
 		double pinf_R = 0.0;
 		double offset = 0.5;
+		double xmin = 0.0;
+		double xmax = 1.0;
 	
 		if (TC == 1)
 		{
@@ -251,9 +253,29 @@ int main()
 			WR(0) = 0.125;
 			WR(1) = 0.0;
 			WR(2) = 0.1;
-			t = 0.15;
+			t = 0.14;
 			filename = "./output/ST1.dat";
 			gammaR = 2.4;
+		}
+		else if (TC == 17)
+		{
+			// Water - air shock tube from Murrone/Guillard 2004
+			
+			WL(0) = 1000.0;
+			WL(1) = 0.0;
+			WL(2) = 1000000000.0;
+			WR(0) = 50.0;
+			WR(1) = 0.0;
+			WR(2) = 100000.0;
+			t = 0.0009;
+			filename = "./output/ST2.dat";
+			offset = 0.7;
+			gammaL = 4.4;
+			gammaR = 1.4;
+			pinf_L = 600000000.0;
+			pinf_R = 0.0;
+			xmin = -2.0;
+			xmax = 2.0;
 		}
 	
 	
@@ -271,8 +293,7 @@ int main()
 		std::cout << "Right rarefaction head speed calculated as " << RS.S_HR << std::endl;
 		std::cout << "Right rarefaction tail speed calculated as " << RS.S_TR << std::endl << std::endl;
 	
-		double xmin = 0.0;
-		double xmax = 1.0;
+		
 		int numsamples = 10000;
 		double delx = (xmax - xmin)/numsamples;
 	
@@ -286,7 +307,8 @@ int main()
 			blitz::Array<double,1> soln (RS.sample_solution(WL, WR, S - offset/t));
 			double thisgamma = S - offset/t < RS.S_STAR ? gammaL : gammaR;
 			double thispinf = S - offset/t < RS.S_STAR ? pinf_L : pinf_R;
-			outfile << x << " " << soln(0) << " " << soln(1) << " " << soln(2) << " " << stiffenedgas_e(soln(0), soln(2), thisgamma, thispinf) << std::endl;
+			double thisz = S - offset/t < RS.S_STAR ? 1.0 : 0.0;
+			outfile << x << " " << soln(0) << " " << soln(1) << " " << soln(2) << " " << stiffenedgas_e(soln(0), soln(2), thisgamma, thispinf) << " " << thisz << std::endl;
 			x += delx;
 		}
 	}
