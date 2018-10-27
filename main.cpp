@@ -1,8 +1,8 @@
 #include "exact_RS_stiffenedgas.hpp"
+#include <Eigen/Dense>
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <blitz/array.h>
 
 
 
@@ -15,13 +15,13 @@ double stiffenedgas_e (double rho, double p, double gamma, double pinf)
 
 int main()
 {
-	// Output solution for each of the five Toro test cases
+	// Output test solution for many different Riemann problems
 
-	for (int TC = 16; TC <= 17; TC++)
+	for (int TC = 1; TC <= 17; TC++)
 	{
 		
-		blitz::Array<double,1> WL (3);
-		blitz::Array<double,1> WR (3);
+		Eigen::Vector3d WL (3);
+		Eigen::Vector3d WR (3);
 		double t;
 		std::string filename;
 	
@@ -32,6 +32,9 @@ int main()
 		double offset = 0.5;
 		double xmin = 0.0;
 		double xmax = 1.0;
+
+
+		// TC1 to TC5 are the 5 shock tube problems from Toro
 	
 		if (TC == 1)
 		{
@@ -42,7 +45,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 0.1;
 			t = 0.25;
-			filename = "./output/TTC1.dat";
+			filename = "TTC1.dat";
 		}
 		else if (TC ==2)
 		{
@@ -53,7 +56,7 @@ int main()
 			WR(1) = 2.0;
 			WR(2) = 0.4;
 			t = 0.15;
-			filename = "./output/TTC2.dat";
+			filename = "TTC2.dat";
 		}
 		else if (TC ==3)
 		{
@@ -64,7 +67,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 0.01;
 			t = 0.012;
-			filename = "./output/TTC3.dat";
+			filename = "TTC3.dat";
 		}
 		else if (TC ==4)
 		{
@@ -75,7 +78,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 100.0;
 			t = 0.035;
-			filename = "./output/TTC4.dat";
+			filename = "TTC4.dat";
 		}
 		else if (TC ==5)
 		{
@@ -86,7 +89,7 @@ int main()
 			WR(1) = -6.19633;
 			WR(2) = 46.0950;
 			t = 0.035;
-			filename = "./output/TTC5.dat";
+			filename = "TTC5.dat";
 		}
 		else if (TC == 6)
 		{
@@ -99,7 +102,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 0.1;
 			t = 0.25;
-			filename = "./output/Samb1.dat";
+			filename = "Samb1.dat";
 			gammaR = 1.667;
 		}
 		else if (TC == 7)
@@ -113,7 +116,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 10000.0;
 			t = 0.0007;
-			filename = "./output/NE1.dat";
+			filename = "NE1.dat";
 			gammaR = 1.2;
 		}
 		else if (TC == 8)
@@ -129,7 +132,7 @@ int main()
 			gammaR = 7.15;
 			pinf_R = 3309.0;
 			t = 0.0007;
-			filename = "./output/rGFM2.dat";
+			filename = "rGFM2.dat";
 		}
 		else if (TC == 9)
 		{
@@ -144,7 +147,7 @@ int main()
 			gammaR = 7.15;
 			pinf_R = 3309.0;
 			t = 0.015;
-			filename = "./output/rGFM4.dat";
+			filename = "rGFM4.dat";
 			offset = 0.6;
 		}
 		else if (TC == 10)
@@ -160,7 +163,7 @@ int main()
 			gammaL = 7.15;
 			pinf_L = 3309.0;
 			t = 0.015;
-			filename = "./output/rGFM_reversed.dat";
+			filename = "rGFM_reversed.dat";
 			offset = 0.4;
 		}
 		else if (TC == 11)
@@ -176,7 +179,7 @@ int main()
 			gammaL = 4.4;
 			pinf_L = 2.4;
 			t = 0.12;
-			filename = "./output/Saurel1.dat";
+			filename = "Saurel1.dat";
 			offset = 0.7;
 		}
 		else if (TC == 12)
@@ -192,7 +195,7 @@ int main()
 			gammaR = 4.4;
 			pinf_R = 2.4;
 			t = 0.12;
-			filename = "./output/Saurel1_reversed.dat";
+			filename = "Saurel1_reversed.dat";
 			offset = 0.3;
 		}
 		else if (TC == 13)
@@ -208,7 +211,7 @@ int main()
 			gammaL = 1.667;
 			gammaR = 1.2;
 			t = 0.045;
-			filename = "./output/NE2.dat";
+			filename = "NE2.dat";
 			offset = 0.2;
 		}
 		else if (TC == 14)
@@ -226,7 +229,7 @@ int main()
 			pinf_L = 0.0;
 			pinf_R = 3309.0;
 			t = 0.0007;
-			filename = "./output/NE3.dat";
+			filename = "NE3.dat";
 			offset = 0.5;
 		}
 		else if (TC == 15)
@@ -240,7 +243,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 0.1;
 			t = 0.15;
-			filename = "./output/ST3.dat";
+			filename = "ST3.dat";
 			gammaR = 1.667;
 		}
 		else if (TC == 16)
@@ -254,7 +257,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 0.1;
 			t = 0.14;
-			filename = "./output/ST1.dat";
+			filename = "ST1.dat";
 			gammaR = 2.4;
 		}
 		else if (TC == 17)
@@ -268,7 +271,7 @@ int main()
 			WR(1) = 0.0;
 			WR(2) = 100000.0;
 			t = 0.0009;
-			filename = "./output/ST2.dat";
+			filename = "ST2.dat";
 			offset = 0.7;
 			gammaL = 4.4;
 			gammaR = 1.4;
@@ -277,11 +280,18 @@ int main()
 			xmin = -2.0;
 			xmax = 2.0;
 		}
+		else
+		{
+			std::cout << "Unknown test case" << std::endl;
+			return 1;
+		}
 	
 	
 		exact_rs_stiffenedgas RS (gammaL, gammaR, pinf_L, pinf_R);
 		RS.solve_RP(WL,WR);
 	
+		std::cout << std::endl;
+		std::cout << "Solved Riemann problem for TC = " << TC << std::endl;
 		std::cout << "Star state pressure calculated as " << RS.P_STAR << std::endl;
 		std::cout << "Star state velocity calculated as " << RS.S_STAR << std::endl;
 		std::cout << "Left star state density calculated as " << RS.rho_star_L << std::endl;
@@ -304,7 +314,7 @@ int main()
 		while (x <= xmax)
 		{
 			double S = x/t;
-			blitz::Array<double,1> soln (RS.sample_solution(WL, WR, S - offset/t));
+			Eigen::Vector3d soln (RS.sample_solution(WL, WR, S - offset/t));
 			double thisgamma = S - offset/t < RS.S_STAR ? gammaL : gammaR;
 			double thispinf = S - offset/t < RS.S_STAR ? pinf_L : pinf_R;
 			double thisz = S - offset/t < RS.S_STAR ? 1.0 : 0.0;

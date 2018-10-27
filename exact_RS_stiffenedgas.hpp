@@ -7,14 +7,10 @@
  */
 
 
-
 #ifndef EXACT_RS_STIFFGAS_H
 #define EXACT_RS_STIFFGAS_H
 
-
-#include <blitz/array.h>
-
-
+#include <Eigen/Dense>
 
 
 class exact_rs_stiffenedgas {
@@ -43,20 +39,10 @@ class exact_rs_stiffenedgas {
 	
 	// Functions used to generate exact solutions to Riemann problems
 
-	void solve_RP (const blitz::Array<double,1>& W_L, const blitz::Array<double,1>& W_R);
+	void solve_RP (const Eigen::Vector3d& W_L, const Eigen::Vector3d& W_R);
 
-	blitz::Array<double,1> sample_solution (const blitz::Array<double,1>& W_L, const blitz::Array<double,1>& W_R, double S);
+	Eigen::Vector3d sample_solution (const Eigen::Vector3d& W_L, const Eigen::Vector3d& W_R, double S);
 	
-	
-	// Function called from 2D Godunov-type methods
-	
-	void celledge_primitives_2D (
-		
-		const blitz::Array<double,1>& W_L, 
-		const blitz::Array<double,1>& W_R,
-		blitz::Array<double,1>& soln
-	);
-
 
 	
 	// Functions used to solve for p_star iteratively
@@ -99,9 +85,9 @@ class exact_rs_stiffenedgas {
 
 	// Functions to find the state inside a rarefaction fan
 
-	void set_left_rarefaction_fan_state (const blitz::Array<double,1>& W_L, double S, blitz::Array<double,1>& W);
+	void set_left_rarefaction_fan_state (const Eigen::Vector3d& W_L, double S, Eigen::Vector3d& W);
 
-	void set_right_rarefaction_fan_state (const blitz::Array<double,1>& W_R, double S, blitz::Array<double,1>& W);
+	void set_right_rarefaction_fan_state (const Eigen::Vector3d& W_R, double S, Eigen::Vector3d& W);
 
 
 
@@ -116,7 +102,5 @@ class exact_rs_stiffenedgas {
 	double a (double rho, double p, double gamma, double pinf);
 
 };
-
-
 
 #endif

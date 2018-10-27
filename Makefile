@@ -8,4 +8,4 @@ $(TARGET) : main.o exact_RS_stiffenedgas.o
 	g++ $(CFLAGS) -o $@ $<
 
 clean:
-	rm *.o $(TARGET)
+	rm *.o *.dat *.ps $(TARGET)

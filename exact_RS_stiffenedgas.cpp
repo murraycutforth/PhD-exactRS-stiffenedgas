@@ -27,16 +27,11 @@ exact_rs_stiffenedgas :: exact_rs_stiffenedgas (double gamma_L, double gamma_R, 
 
 
 
-
-
-
-
-
-void exact_rs_stiffenedgas :: solve_RP (const blitz::Array<double,1>& W_L, const blitz::Array<double,1>& W_R)
+void exact_rs_stiffenedgas :: solve_RP (const Eigen::Vector3d& W_L, const Eigen::Vector3d& W_R)
 {
 	assert(W_L(0) >= 0.0);
-	// assert(W_L(2) >= 0.0); Since stiffened gases will often exhibit p<0..
 	assert(W_R(0) >= 0.0);
+	// assert(W_L(2) >= 0.0); Since stiffened gases will often exhibit p<0..
 	// assert(W_R(2) >= 0.0);
 
 	
@@ -99,9 +94,9 @@ void exact_rs_stiffenedgas :: solve_RP (const blitz::Array<double,1>& W_L, const
 
 
 
-blitz::Array<double,1> exact_rs_stiffenedgas :: sample_solution (const blitz::Array<double,1>& W_L, const blitz::Array<double,1>& W_R, double S)
+Eigen::Vector3d exact_rs_stiffenedgas :: sample_solution (const Eigen::Vector3d& W_L, const Eigen::Vector3d& W_R, double S)
 {
-	blitz::Array<double,1> W (3);
+	Eigen::Vector3d W (3);
 
 	
 	// Find appropriate part of solution and return primitives
@@ -193,148 +188,6 @@ blitz::Array<double,1> exact_rs_stiffenedgas :: sample_solution (const blitz::Ar
 
 	return W;
 }
-
-
-
-
-
-void exact_rs_stiffenedgas :: celledge_primitives_2D (
-		
-	const blitz::Array<double,1>& W_L, 
-	const blitz::Array<double,1>& W_R,
-	blitz::Array<double,1>& soln
-)
-{
-	//~ const double v_L = W_L(2);
-	//~ const double v_R = W_R(2);
-	
-	
-	//~ // Calculate p_star
-
-	//~ P_STAR = find_p_star_newtonraphson(W_L(0), W_L(1), W_L(3), W_R(0), W_R(1), W_R(3));
-	
-	
-	//~ // Calculate u_star
-
-	//~ S_STAR = 0.5*(W_L(1)+W_R(1)) + 0.5*(f(P_STAR,W_R(0),W_R(3),gamma_R,pinf_R) - f(P_STAR,W_L(0),W_L(3),gamma_L,pinf_L));
-	
-	
-	//~ if (S_STAR > 0.0)
-	//~ {
-		//~ // Look at states to the left of the contact
-		
-		//~ soln(2) = v_L;
-		
-		//~ if (P_STAR > W_L(3))
-		//~ {
-			//~ // Left shock
-			
-			//~ S_L = W_L(1) - (Q_K(P_STAR,W_L(0),W_L(3),gamma_L,pinf_L)/W_L(0));
-			
-			//~ if (S_L > 0.0)
-			//~ {
-				//~ soln = W_L;
-			//~ }
-			//~ else
-			//~ {
-				//~ soln(0) = W_L(0)*((2.0*gamma_L*pinf_L + (gamma_L+1.0)*P_STAR + (gamma_L-1.0)*W_L(3))/(2.0*(W_L(3) + gamma_L*pinf_L) + (gamma_L-1.0)*P_STAR + (gamma_L-1.0)*W_L(3)));
-				//~ soln(1) = S_STAR;
-				//~ soln(3) = P_STAR;
-			//~ }
-		//~ }
-		//~ else
-		//~ {
-			//~ // Left rarefaction
-			
-			//~ double a_L = a(W_L(0), W_L(3), gamma_L, pinf_L);
-			//~ double a_star_L = a_L*std::pow((P_STAR + pinf_L)/(W_L(3) + pinf_L), (gamma_L-1.0)/(2.0*gamma_L));
-			//~ S_HL = W_L(1) - a_L;
-			//~ S_TL = S_STAR - a_star_L;
-			
-			//~ if (S_HL > 0.0)
-			//~ {
-				//~ soln = W_L;
-			//~ }
-			//~ else
-			//~ {
-				//~ if (S_TL < 0.0)
-				//~ {
-					//~ soln(0) = W_L(0)*std::pow((P_STAR + pinf_L)/(W_L(3) + pinf_L), 1.0/gamma_L);
-					//~ soln(1) = S_STAR;
-					//~ soln(3) = P_STAR;
-				//~ }
-				//~ else
-				//~ {
-					//~ double a_L = a(W_L(0),W_L(3),gamma_L,pinf_L);
-					//~ soln(0) = W_L(0)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1)), 2.0/(gamma_L - 1.0));
-					//~ soln(1) = (2.0/(gamma_L+1.0))*(a_L + ((gamma_L-1.0)/2.0)*W_L(1));
-					//~ soln(3) = (W_L(3) + pinf_L)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1)), (2.0*gamma_L)/(gamma_L-1.0)) - pinf_L;
-				//~ }
-			//~ }
-		//~ }
-	//~ }
-	//~ else
-	//~ {
-		//~ // Look at states to the right of the contact
-		
-		//~ soln(2) = v_R;
-		
-		//~ if (P_STAR > W_R(3))
-		//~ {
-			//~ // Right shock
-			
-			//~ S_R = W_R(1) + (Q_K(P_STAR,W_R(0),W_R(3),gamma_R,pinf_R)/W_R(0));
-			
-			//~ if (S_R < 0.0)
-			//~ {
-				//~ soln = W_R;
-			//~ }
-			//~ else
-			//~ {
-				//~ soln(0) = W_R(0)*((2.0*gamma_R*pinf_R + (gamma_R+1.0)*P_STAR + (gamma_R-1.0)*W_R(3))/(2.0*(W_R(3) + gamma_R*pinf_R) + (gamma_R-1.0)*P_STAR + (gamma_R-1.0)*W_R(3)));
-				//~ soln(1) = S_STAR;
-				//~ soln(3) = P_STAR;
-			//~ }
-		//~ }
-		//~ else
-		//~ {
-			//~ // Right rarefaction
-			
-			//~ double a_R = a(W_R(0),W_R(3),gamma_R,pinf_R);
-			//~ double a_star_R = a_R*std::pow((P_STAR + pinf_R)/(W_R(3) + pinf_R), (gamma_R-1.0)/(2.0*gamma_R));
-			//~ S_HR = W_R(1) + a_R;
-			//~ S_TR = S_STAR + a_star_R;
-			
-			//~ if (S_HR < 0.0)
-			//~ {
-				//~ soln = W_R;
-			//~ }
-			//~ else
-			//~ {
-				//~ if (S_TL > 0.0)
-				//~ {
-					//~ soln(0) = W_R(0)*std::pow((P_STAR + pinf_R)/(W_R(3) + pinf_R), 1.0/gamma_R);
-					//~ soln(1) = S_STAR;
-					//~ soln(3) = P_STAR;
-				//~ }
-				//~ else
-				//~ {
-					//~ double a_R = a(W_R(0),W_R(3),gamma_R,pinf_R);
-
-					//~ soln(0) = W_R(0)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1)), 2.0/(gamma_R - 1.0)); 
-					//~ soln(1) = (2.0/(gamma_R+1.0))*(- a_R + ((gamma_R-1.0)/2.0)*W_R(1));
-					//~ soln(3) = (W_R(3) + pinf_R)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1)), (2.0*gamma_R)/(gamma_R-1.0)) - pinf_R;
-				//~ }
-			//~ }
-		//~ }
-	//~ }
-}
-
-
-
-
-
-
 
 
 
@@ -455,16 +308,7 @@ double exact_rs_stiffenedgas :: f_deriv (double p_star, double rho, double p, do
 
 
 
-
-
-
-
-
-
-
-
-
-void exact_rs_stiffenedgas :: set_left_rarefaction_fan_state (const blitz::Array<double,1>& W_L, double S, blitz::Array<double,1>& W)
+void exact_rs_stiffenedgas :: set_left_rarefaction_fan_state (const Eigen::Vector3d& W_L, double S, Eigen::Vector3d& W)
 {
 	double a_L = a(W_L(0),W_L(2),gamma_L,pinf_L);
 	W(0) = W_L(0)*std::pow((2.0/(gamma_L+1.0)) + ((gamma_L-1.0)/(a_L*(gamma_L+1.0)))*(W_L(1) - S), 2.0/(gamma_L - 1.0));
@@ -476,26 +320,13 @@ void exact_rs_stiffenedgas :: set_left_rarefaction_fan_state (const blitz::Array
 
 
 
-void exact_rs_stiffenedgas :: set_right_rarefaction_fan_state (const blitz::Array<double,1>& W_R, double S, blitz::Array<double,1>& W)
+void exact_rs_stiffenedgas :: set_right_rarefaction_fan_state (const Eigen::Vector3d& W_R, double S, Eigen::Vector3d& W)
 {
 	double a_R = a(W_R(0),W_R(2),gamma_R,pinf_R);
 	W(0) = W_R(0)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1) - S), 2.0/(gamma_R - 1.0));
 	W(1) = (2.0/(gamma_R+1.0))*(- a_R + S + ((gamma_R-1.0)/2.0)*W_R(1));
 	W(2) = (W_R(2) + pinf_R)*std::pow((2.0/(gamma_R+1.0)) - ((gamma_R-1.0)/(a_R*(gamma_R+1.0)))*(W_R(1) - S), (2.0*gamma_R)/(gamma_R-1.0)) - pinf_R;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -513,12 +344,10 @@ double exact_rs_stiffenedgas :: Q_K (double p_star, double rho, double p, double
 
 
 
-
 double exact_rs_stiffenedgas :: a (double rho, double p, double gamma, double pinf)
 {
 	return sqrt(gamma*((p+pinf)/rho));
 }
-
 
 
 
